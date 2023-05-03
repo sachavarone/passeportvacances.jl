@@ -1,5 +1,28 @@
+# SPDX-License-Identifier: MIT
+
 module passeportvacances
 
-# Write your package code here.
+export run
 
-end
+# install and call the packages
+include("packages.jl")
+# constraint functions
+include("func_constraint.jl")
+# create the MIP model
+include("createmodel.jl");
+# constraint functions
+include("func_balance.jl")
+# get and write the solution
+include("solution.jl")
+
+# get data from database
+include("data.MySQL.jl")
+# enhance data
+include("data.enhance.jl")
+
+# get additional parameters
+include("parameters.jl")
+# create, solve, analyse model
+include("runs.jl")
+
+ end
