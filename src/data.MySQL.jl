@@ -13,8 +13,9 @@ using DataFrames
 # database = ENV["PV_DATABASE"]
 
 
-function readDataMySQL()
-    conn = DBInterface.connect(MySQL.Connection, host, user, passwd, db=database)
+function readDataMySQL(dbname::String)
+ #   conn = DBInterface.connect(MySQL.Connection, host, user, passwd, db=database)
+    conn = DBInterface.connect(MySQL.Connection, host, user, passwd, db=dbname)
     field = ["activity", "child", "knome", "lifetime", "occurrence", "preference", "period", "assigned"]
     query = string.("SELECT * FROM ", "vr_julia_", field)
 

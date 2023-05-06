@@ -1,5 +1,5 @@
 
-function run()
+function run(dbname::String)
 # get the data
 df_activity, 
 df_child ,
@@ -8,7 +8,7 @@ df_lifetime,
 df_occurrence, 
 df_preference, 
 df_period, 
-df_assigned = readDataMySQL()
+df_assigned = readDataMySQL(dbname)
 
 # # export as csv files
 # field = ["activity", "child", "knome", "lifetime", "occurrence", "preference", "period", "assigned"]

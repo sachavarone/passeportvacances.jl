@@ -13,4 +13,6 @@ t = Template(;
                GitHubActions(),
            ],
        )
+# Template(; user="user", disable_defaults=[Git]) to disable all Git interactions
+
 t("passeportvacances")
