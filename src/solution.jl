@@ -83,7 +83,7 @@ function getremainder(solution, df_occurrence, df_activity)
     df = leftjoin(df, df_activity[:,[:idactivity, :minchild, :maxchild]], on=:idactivity);
     df[!,:effectif] = coalesce.(df[:,:effectif], 0);
     df[!,:remainder] = df[:,:maxchild] - df[:,:effectif];
-    df[!,:freeratio] = df[:,:remainder] ./ df[:,:maxchild];
+    # df[!,:freeratio] = df[:,:remainder] ./ df[:,:maxchild]
 
     # return remaining units in assigned occurrences
     return df

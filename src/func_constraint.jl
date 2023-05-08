@@ -188,7 +188,8 @@ subdf=groupby(dfp, [:idpasseport]);
 @variable(m, cmoins[1:length(subdf)] >= 0);
 
 @constraint(m, absvalue[group in 1:length(subdf)], (sum(
-x[subdf[group][pref, :idpreference]]*subdf[group][pref, :pricechild]+x[subdf[group][pref, :idpreference]]*subdf[group][pref, :pricefixed]/subdf[group][pref, :minchild]
+x[subdf[group][pref, :idpreference]]*subdf[group][pref, :pricechild]+
+x[subdf[group][pref, :idpreference]]*subdf[group][pref, :pricefixed]/ max(subdf[group][pref, :minchild],1)
 for pref in 1:nrow(subdf[group]))
 -meanPrice*1.2)==cplus[group]-cmoins[group])
 
