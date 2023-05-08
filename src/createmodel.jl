@@ -241,7 +241,7 @@ end # if solver
     constraintMultiOccurrence!(m, df_preference, df_occurrence)
 
     # create the objective function
-    z = zCostProblem(df_preference, weightChoice, weightCost, m)
+    z = zCost(df_preference, weightChoice, weightCost, m)
     # Set objective function and sense
     @objective(m, Max, z)
 

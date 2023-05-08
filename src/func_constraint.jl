@@ -156,31 +156,11 @@ function zCost4(dfp::DataFrame, weightChoice::Float64 , weightCost::Float64, m)
   return z
 end # function zCost4
 
-# compute cost assignement
-# dfp = data frame preferences
-function zCost(dfp::DataFrame, weightChoice::Float64 , weightCost::Float64, m)
-  x=m[:x]
-  yOpen=m[:yOpen]
-
-# compute the objectives
-zPref = sum(x[dfp[numpref,:idpreference]]*dfp[numpref,:zpref]
-            for numpref in 1:nrow(dfp))
-
-# compute maximal values for each objectives
-zprefmax = maxScorePreference(dfp);
-# set the weights between objectives
-wPref = weightChoice / zprefmax
-
-# compute the objective
-z = wPref * zPref
-return z
-end # function zCost
-
 
 # ERROR: The solver does not support an objective function of type MathOptInterface.ScalarAffineFunction{DecFP.Dec64}.
 # compute cost assignement
 # dfp = data frame preferences
-function zCostProblem(dfp::DataFrame, weightChoice::Float64 , weightCost::Float64, m)
+function zCost(dfp::DataFrame, weightChoice::Float64 , weightCost::Float64, m)
   x=m[:x]
   yOpen=m[:yOpen]
 
@@ -204,34 +184,27 @@ meanPrice=Price/Nchild
 subdf=groupby(dfp, [:idpasseport]);
 
 # add variables and constraintes to linearise the abs value
-@variable(m, cplus[1:length(subdf)]);
-@variable(m, cmoins[1:length(subdf)]);
+@variable(m, cplus[1:length(subdf)] >= 0);
+@variable(m, cmoins[1:length(subdf)] >= 0);
 
 @constraint(m, absvalue[group in 1:length(subdf)], (sum(
 x[subdf[group][pref, :idpreference]]*subdf[group][pref, :pricechild]+x[subdf[group][pref, :idpreference]]*subdf[group][pref, :pricefixed]/subdf[group][pref, :minchild]
 for pref in 1:nrow(subdf[group]))
 -meanPrice*1.2)==cplus[group]-cmoins[group])
-@constraint(m, bornesplus[j in 1:length(subdf)], cplus[j]>=0)
-@constraint(m, bornesmoins[j in 1:length(subdf)], cmoins[j]>=0)
-
-# cplus = @variable(m, [group in eachindex(subdf)], lower_bound=0)
-# cmoins = @variable(m, [group in eachindex(subdf)], lower_bound=0)
-# @constraint(m, [group in eachindex(subdf)], sum(x[pref,:idpreference] * (subdf[group][pref,:pricechild] + subdf[group][pref,:pricefixed] / subdf[group][pref,:minchild])
-#      for pref in 1:size(subdf[group],1)) / size(subdf[group],1) + 0.2 * meanPrice <= cplus[group] - cmoins[group])
-
 
 zPrice=sum(cplus); # minimise only the one who are too expensive
 
 # compute maximal values for each objectives
 zprefmax = maxScorePreference(dfp);
 zpricemax = maxScorePrice(dfp);
+zpricemax = convert(Int64, zpricemax)
 # set the weights between objectives
 wPref = weightChoice / zprefmax
 wPrice = weightCost / zpricemax
 # compute the objective
 z = wPref * zPref - wPrice * zPrice
 return z
-end # function zCostProblem
+end # function zCost
 
 
 # build a dataframe which contains period specific idpreference and child
