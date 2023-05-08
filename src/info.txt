@@ -1,9 +1,0 @@
-Problem 1:
-in createmodel.jl
-    df_equal, df_invalid = getMulti(df_preference, df_occurrence)
-voir func_constraint.jl, function getMultioccurrence(dfo::DataFrame), ligne append!(df, getListoccurrenceFromInitial(oInit, dfo))
-Solved - changer Int64 en Int32 dans getListoccurrenceFromInitial -
-
-Problem 2:
-ERROR: The solver does not support an objective function of type MathOptInterface.ScalarAffineFunction{DecFP.Dec64}.
-see func_constraint.jl, function zCostProblem: computation of the cost 
