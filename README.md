@@ -12,3 +12,10 @@ It includes, in its original version,
     a modelisation as a Mixed Integer Programming model (MIP)
     a query to a MIP solver, by default Cbc
     a solution written to a MySQL database
+
+It does not include
+    a database
+    views as requests in the database
+so that this project is usefull only if you have your own data.
+
+Usage: passeporvacances.run(database_name)
