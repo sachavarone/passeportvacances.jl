@@ -81,17 +81,21 @@ if status == MOI.OPTIMAL
     @info "Primary model solved."
 else
     @warn status
+    return
 end
 
+@info "Entering pre-assignment validation phase ..."
 # find valid pre-assignments
 setValidPreAssignement!(m, df_assigned)
+validAssignement = string("Preassigned: ", sum(df_assigned[:,:valid]), " valid over ", nrow(df_assigned))
+@info validAssignement
+
 # set the valid pre-assigned constraints
 df_partialassigned = df_assigned[df_assigned[:,:valid].==true,:]
 constraintPartialAssigned!(m, df_partialassigned)
 optimize!(m)
 status = termination_status(m)
-validAssignement = string("Preassigned: ", sum(df_assigned[:,:valid]), " valid over ", nrow(df_assigned))
-@info validAssignement
+@info "Model with pre-assignment solved"
 
 # status of the optimisation should be "Optimal"
 if status == MOI.OPTIMAL
@@ -109,12 +113,12 @@ if status == MOI.OPTIMAL
     # compute the remaining available place for each occurrences
     remainder = getremainder(solution, df_occurrence, df_activity)
 
-    @info "Solution from optimisation."
+    @info "Solution retrieved."
 
     # write table solution into the database
-    writeSolutionMySQL("solution", solution)
+    writeSolutionMySQL(dbname, "solution", solution)
     # write table remainder into the database
-    writeSolutionMySQL("remainder", remainder)
+    writeSolutionMySQL(dbname, "remainder", remainder)
 
     @info "Tables 'solution' and 'remainder' written in the database."
 else

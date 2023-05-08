@@ -10,7 +10,7 @@ using DataFrames
 # host = "127.0.0.1" # do not use 'localhost'
 # user = ENV["PV_USER"]
 # passwd = ENV["PV_PASSWORD"]
-# database = ENV["PV_DATABASE"]
+# dbname = ENV["PV_DATABASE"]
 
 
 function readDataMySQL(dbname::String)
@@ -32,7 +32,7 @@ function readDataMySQL(dbname::String)
     return df_activity, df_child, df_knome, df_lifetime, df_occurrence, df_preference, df_period, df_assigned
 end # function readDataMySQL
 
- function writeSolutionMySQL(s::String, df::DataFrame)
+ function writeSolutionMySQL(dbname::String, s::String, df::DataFrame)
     # # get dataframe from its name
     # df = eval(Meta.parse(s))
 
@@ -42,7 +42,7 @@ end # function readDataMySQL
         df[!, :exceed] = convert.(Int, df[:, :exceed])
     end
 
-    conn = DBInterface.connect(MySQL.Connection, host, user, passwd, db=database)
+    conn = DBInterface.connect(MySQL.Connection, host, user, passwd, db=dbname)
         query = string.("DROP TABLE IF EXISTS ", s, ";")
         DBInterface.execute(conn, query)
         MySQL.load(df, conn, s)
