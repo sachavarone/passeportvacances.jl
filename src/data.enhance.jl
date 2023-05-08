@@ -44,7 +44,7 @@ function enhanceassigned(df_assigned, df_preference)
 
     # add idpreference to df_assigned
     df = innerjoin(df_assigned, df_preference[:,[:idpasseport, :idoccurrence, :idpreference]], on=[:idpasseport, :idoccurrence])
-
+ 
     return df
 end
 

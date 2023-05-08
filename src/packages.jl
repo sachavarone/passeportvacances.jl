@@ -50,11 +50,6 @@ if ! in("Statistics",keys(installs))
 end
 using Statistics
 
-# if ! in("SQLite",keys(installs))
-# 	Pkg.add("SQLite")
-# end
-# using SQLite
-
 if ! in("ODBC",keys(installs))
 	Pkg.add("ODBC")
 end

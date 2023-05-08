@@ -166,6 +166,28 @@ function zCost(dfp::DataFrame, weightChoice::Float64 , weightCost::Float64, m)
 zPref = sum(x[dfp[numpref,:idpreference]]*dfp[numpref,:zpref]
             for numpref in 1:nrow(dfp))
 
+# compute maximal values for each objectives
+zprefmax = maxScorePreference(dfp);
+# set the weights between objectives
+wPref = weightChoice / zprefmax
+
+# compute the objective
+z = wPref * zPref
+return z
+end # function zCost
+
+
+# ERROR: The solver does not support an objective function of type MathOptInterface.ScalarAffineFunction{DecFP.Dec64}.
+# compute cost assignement
+# dfp = data frame preferences
+function zCostProblem(dfp::DataFrame, weightChoice::Float64 , weightCost::Float64, m)
+  x=m[:x]
+  yOpen=m[:yOpen]
+
+# compute the objectives
+zPref = sum(x[dfp[numpref,:idpreference]]*dfp[numpref,:zpref]
+            for numpref in 1:nrow(dfp))
+
 # group by occurrences
 subdf = groupby(dfp, [:idoccurrence]);
 zPriceChild = sum(x[dfp[numpref,:idpreference]]*dfp[numpref,:pricechild]
@@ -209,7 +231,7 @@ wPrice = weightCost / zpricemax
 # compute the objective
 z = wPref * zPref - wPrice * zPrice
 return z
-end # function zCost
+end # function zCostProblem
 
 
 # build a dataframe which contains period specific idpreference and child
@@ -258,7 +280,7 @@ end # function getInitialMultioccurrence
 # get the list of occurrences from initial occurrence in multiple occurrences
 # oInit = initial occurrence
 # dfo  = df_occurrence
-function getListoccurrenceFromInitial(oInit::Int64, dfo::DataFrame)
+function getListoccurrenceFromInitial(oInit::Int32, dfo::DataFrame)
   # create the list with the initial occurrence
   df = DataFrame(idoccurrence = [oInit])
   # get the index
@@ -287,7 +309,7 @@ function getMultioccurrence(dfo::DataFrame)
   df_init = getInitialMultioccurrence(dfo::DataFrame)
   # loop for each initial occurrence
   for oInit in df_init[:,:idoccurrence]
-	append!(df, getListoccurrenceFromInitial(oInit, dfo))
+    append!(df, getListoccurrenceFromInitial(oInit, dfo))
   end # for oInit
   return df
 end # function getMultioccurrence

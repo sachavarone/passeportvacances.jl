@@ -8,6 +8,7 @@ mincv = 0.4
 zvalue = 2.8
 agecategorylimit = [today()] # by default, no category "2020-09-01"
 solvername = "CBC"
+# solvername = "HiGHS"
 
 ##################################
 # MySQL parameters               #

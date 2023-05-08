@@ -63,6 +63,8 @@ function getsolution(status, df_preference, df_occurrence, df_child, zvalue, m, 
 
     else
         solution = 0
+        df_analysis = DataFrame()
+        @info status
     end # if status
 
 	return solution, df_analysis
