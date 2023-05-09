@@ -8,6 +8,7 @@ function setValidPreAssignement!(m::Model, df_assigned::DataFrame)
     end
 
     for i in 1:nrow(df_assigned)
+        sinfo = string("     Preassigned ", i)
         df_assigned[i,:valid] = true
         df_partialassigned = df_assigned[df_assigned[:,:valid].==true,:]
     
@@ -17,10 +18,15 @@ function setValidPreAssignement!(m::Model, df_assigned::DataFrame)
     
         if status != MOI.OPTIMAL
             df_assigned[i,:valid] = false
+            sinfo = string(sinfo, " failed")
+        else
+            sinfo = string(sinfo, " passed")
         end
-    
+
         delete.(m, m[:assigned])
         unregister(m, :assigned)
+
+        @info sinfo
     end
 end
 
