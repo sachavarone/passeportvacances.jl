@@ -1,14 +1,33 @@
 function setValidPreAssignement!(m::Model, df_assigned::DataFrame)
-    # add a valid column set to false by default
-    df_assigned[!,:valid] .= false
-
     # do nothing else if there is no entries as pre-assignement
     if nrow(df_assigned)==0
         return
     end
 
+    # trying to optimize with all pre-assignements
+    constraintPartialAssigned!(m, df_assigned)
+    optimize!(m)
+    status = termination_status(m)
+
+    if status == MOI.OPTIMAL
+        # add a valid column set to true
+        df_assigned[!,:valid] .= true
+        @info "Complete model with all pre-assignement solved"
+        return df_assigned
+    else
+        # delete constraints
+        delete.(m, m[:assigned])
+        unregister(m, :assigned)
+        @info "Entering pre-assignment validation phase ..."
+    end
+    
+     # add a valid column set to false by default
+     df_assigned[!,:valid] .= false
+     # comment 
+     sInfoPrefix = "     Preassigned "
+     # check all pre-assignment constraints one by one
     for i in 1:nrow(df_assigned)
-        sinfo = string("     Preassigned ", i)
+        sinfo = string(sInfoPrefix, i)
         df_assigned[i,:valid] = true
         df_partialassigned = df_assigned[df_assigned[:,:valid].==true,:]
     
@@ -28,7 +47,31 @@ function setValidPreAssignement!(m::Model, df_assigned::DataFrame)
 
         @info sinfo
     end
+    validAssignement = string("Preassigned: ", sum(df_assigned[:,:valid]), " valid over ", nrow(df_assigned))
+    @info validAssignement
+
+    return df_assigned
 end
+
+function runValidPreAssignment(previousStatus::MOI.TerminationStatusCode, m::Model, df_assigned::DataFrame)
+    status = previousStatus
+    # check if existintg preassignments
+    if nrow(df_assigned)>0
+        # find valid pre-assignments
+        df_assigned = setValidPreAssignement!(m, df_assigned)
+
+        if sum(df_assigned[:,:valid]) < nrow(df_assigned)
+            # set the valid pre-assigned constraints
+            df_partialassigned = df_assigned[df_assigned[:,:valid].==true,:]
+            constraintPartialAssigned!(m, df_partialassigned)
+            optimize!(m)
+            status = termination_status(m)
+            @info "Model with pre-assignment solved"
+        end
+    end # if nrow(df_assigned)>0
+    return status
+end
+
 
 function run(dbname::String)
 # get the data
@@ -90,18 +133,7 @@ else
     return
 end
 
-@info "Entering pre-assignment validation phase ..."
-# find valid pre-assignments
-setValidPreAssignement!(m, df_assigned)
-validAssignement = string("Preassigned: ", sum(df_assigned[:,:valid]), " valid over ", nrow(df_assigned))
-@info validAssignement
-
-# set the valid pre-assigned constraints
-df_partialassigned = df_assigned[df_assigned[:,:valid].==true,:]
-constraintPartialAssigned!(m, df_partialassigned)
-optimize!(m)
-status = termination_status(m)
-@info "Model with pre-assignment solved"
+status = runValidPreAssignment(status, m, df_assigned)
 
 # status of the optimisation should be "Optimal"
 if status == MOI.OPTIMAL
