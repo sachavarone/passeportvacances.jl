@@ -1,7 +1,9 @@
 function setValidPreAssignement!(m::Model, df_assigned::DataFrame)
     # do nothing else if there is no entries as pre-assignement
     if nrow(df_assigned)==0
-        return
+        # for coherence and avoid trouble later in writing as a table
+        df_assigned[!,:valid] .= true
+        return df_assigned
     end
 
     # trying to optimize with all pre-assignements
@@ -12,13 +14,13 @@ function setValidPreAssignement!(m::Model, df_assigned::DataFrame)
     if status == MOI.OPTIMAL
         # add a valid column set to true
         df_assigned[!,:valid] .= true
-        @info "Complete model with all pre-assignement solved"
+        @info "Complete model with all pre-assignements solved"
         return df_assigned
     else
         # delete constraints
         delete.(m, m[:assigned])
         unregister(m, :assigned)
-        @info "Entering pre-assignment validation phase ..."
+        @info "Entering pre-assignments validation phase ..."
     end
     
      # add a valid column set to false by default
@@ -157,10 +159,13 @@ if status == MOI.OPTIMAL
     writeSolutionMySQL(dbname, "solution", solution)
     # write table remainder into the database
     writeSolutionMySQL(dbname, "remainder", remainder)
-    # write table preassigned into the database
-    writeSolutionMySQL(dbname, "preassigned", df_assigned)
+    @info "Tables 'solution' and 'remainder' written in the database."
+    if nrow(df_assigned)>0
+        # write table preassigned into the database
+        writeSolutionMySQL(dbname, "preassigned", df_assigned)
+        @info "Table 'preassigned' written in the database"
+    end
 
-    @info "Tables 'solution', 'remainder' and 'preassigned' written in the database."
 else
     @warn status
 end

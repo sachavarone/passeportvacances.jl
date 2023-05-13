@@ -33,8 +33,10 @@ function readDataMySQL(dbname::String)
 end # function readDataMySQL
 
  function writeSolutionMySQL(dbname::String, s::String, df::DataFrame)
-    # # get dataframe from its name
-    # df = eval(Meta.parse(s))
+    # avoid problems with empty dataframe
+    if nrow(df)==0
+        return
+    end
 
     # trick to avoid error with boolean values in the db
     if s=="solution"
