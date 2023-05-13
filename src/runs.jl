@@ -53,7 +53,7 @@ function setValidPreAssignement!(m::Model, df_assigned::DataFrame)
     return df_assigned
 end
 
-function runValidPreAssignment(previousStatus::MOI.TerminationStatusCode, m::Model, df_assigned::DataFrame)
+function runValidPreAssignment!(previousStatus::MOI.TerminationStatusCode, m::Model, df_assigned::DataFrame)
     status = previousStatus
     # check if existintg preassignments
     if nrow(df_assigned)>0
@@ -133,7 +133,7 @@ else
     return
 end
 
-status = runValidPreAssignment(status, m, df_assigned)
+status = runValidPreAssignment!(status, m, df_assigned)
 
 # status of the optimisation should be "Optimal"
 if status == MOI.OPTIMAL
@@ -157,8 +157,10 @@ if status == MOI.OPTIMAL
     writeSolutionMySQL(dbname, "solution", solution)
     # write table remainder into the database
     writeSolutionMySQL(dbname, "remainder", remainder)
+    # write table preassigned into the database
+    writeSolutionMySQL(dbname, "preassigned", remainder)
 
-    @info "Tables 'solution' and 'remainder' written in the database."
+    @info "Tables 'solution', 'remainder' and 'preassigned' written in the database."
 else
     @warn status
 end
