@@ -158,7 +158,7 @@ if status == MOI.OPTIMAL
     # write table remainder into the database
     writeSolutionMySQL(dbname, "remainder", remainder)
     # write table preassigned into the database
-    writeSolutionMySQL(dbname, "preassigned", remainder)
+    writeSolutionMySQL(dbname, "preassigned", df_assigned)
 
     @info "Tables 'solution', 'remainder' and 'preassigned' written in the database."
 else

@@ -41,6 +41,10 @@ end # function readDataMySQL
         # convert boolean field into Int field
         df[!, :exceed] = convert.(Int, df[:, :exceed])
     end
+    if s=="preassigned"
+        # convert boolean field into Int field
+        df[!, :valid] = convert.(Int, df[:, :valid])
+    end
 
     conn = DBInterface.connect(MySQL.Connection, host, user, passwd, db=dbname)
         query = string.("DROP TABLE IF EXISTS ", s, ";")
