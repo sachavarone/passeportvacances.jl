@@ -96,17 +96,41 @@ end # function getPrefVector
 
 # compute max score preference
 # dfp = data frame preferences
-function maxScorePreference(dfp::DataFrame)
+function oldmaxScorePreference(dfp::DataFrame)
   temp = sum(dfp[:,:zpref])
+  return temp
+end # function maxScorePreference
+
+# compute max score preference
+# dfp = data frame preferences
+function maxScorePreference(dfp::DataFrame)
+  # get sub dataframe of child
+  gdf = groupby(dfp, :idpasseport)
+  subdf = combine(gdf, :zpref => sum => :sumPref)
+  temp = maximum(subdf[:,:sumPref])
+  
   return temp
 end # function maxScorePreference
 
 # compute max score cost
 # dfp = data frame preferences
-function maxScorePrice(dfp::DataFrame)
+function oldmaxScorePrice(dfp::DataFrame)
   temp = sum(dfp[:,:pricechild]) + sum(dfp[:,:pricefixed])
   return temp
 end # function maxScorePrice
+
+# compute max score cost
+# dfp = data frame preferences
+function maxScorePrice(dfp::DataFrame)
+  tempdf = dfp
+  tempdf.sumPrice .= dfp.pricechild+dfp.pricefixed
+   # get sub dataframe of child
+   gdf = groupby(tempdf, :idpasseport)
+   subdf = combine(gdf, [:sumPrice] => sum, renamecols=false)
+   temp = maximum(subdf[:,:sumPrice])
+  return temp
+end # function maxScorePrice
+
 
 # compute cost assignement
 # dfp = data frame preferences
@@ -198,7 +222,7 @@ zPrice=sum(cplus); # minimise only the one who are too expensive
 # compute maximal values for each objectives
 zprefmax = maxScorePreference(dfp);
 zpricemax = maxScorePrice(dfp);
-zpricemax = convert(Int64, zpricemax)
+zpricemax = convert(Float64, zpricemax)
 # set the weights between objectives
 wPref = weightChoice / zprefmax
 wPrice = weightCost / zpricemax

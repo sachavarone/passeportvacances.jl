@@ -3,7 +3,7 @@
 module passeportvacances
 
 export run
-# run: passeportvacances.run("farfadet_vouvry")
+# run: passeportvacances.run("farfadet_neuchatel")
 
 # install and call the packages
 include("packages.jl")
