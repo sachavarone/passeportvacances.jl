@@ -3,7 +3,9 @@
 module passeportvacances
 
 export run
-# run: passeportvacances.run("farfadet_neuchatel")
+# run: passeportvacances.run("farfadet_chalais")
+# run: passeportvacances.run("farfadet_chalais", "GUROBI")
+# run: passeportvacances.run("farfadet_chalais", "NEOS")
 
 # install and call the packages
 include("packages.jl")
@@ -15,7 +17,7 @@ include("createmodel.jl");
 include("func_balance.jl")
 # get and write the solution
 include("solution.jl")
-
+ 
 # get data from database
 include("data.MySQL.jl")
 # enhance data
@@ -27,3 +29,4 @@ include("parameters.jl")
 include("runs.jl")
 
  end
+ 

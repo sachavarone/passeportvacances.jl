@@ -75,7 +75,7 @@ function runValidPreAssignment!(previousStatus::MOI.TerminationStatusCode, m::Mo
 end
 
 
-function run(dbname::String)
+function run(dbname::String, solvername = "CBC")
 # get the data
 df_activity, 
 df_child ,
@@ -103,7 +103,15 @@ df_assigned = readDataMySQL(dbname)
  df_preference[!, :zpref] = computeChoiceScore(df_preference, df_occurrence)
  @info "Data joint."
  
-# create the model
+#  CSV.write("./data/child.csv", df_child,  delim=',');
+#  CSV.write("./data/activity.csv", df_activity,  delim=',');
+#  CSV.write("./data/period.csv", df_period,  delim=',');
+#  CSV.write("./data/lifetime.csv", df_lifetime,  delim=',');
+#  CSV.write("./data/occurrence.csv", df_occurrence,  delim=',');
+#  CSV.write("./data/preference.csv", df_preference,  delim=',');
+#  CSV.write("./data/knome.csv", df_knome,  delim=',');
+  
+ # create the model
 m = createmodel(
     df_child,
     df_activity,
@@ -119,9 +127,13 @@ m = createmodel(
 @info "Primary model built."
 
 # disable printing output from the solver
-set_silent(m)
-# # enable printing output from the solver
-# unset_silent(m)
+if solvername != "NEOS"
+    set_silent(m)
+else
+    # enable printing output from the solver
+    unset_silent(m)
+end
+
 # solve the problem
 optimize!(m)
 # get the status of the resolution

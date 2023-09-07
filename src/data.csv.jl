@@ -9,7 +9,7 @@ function exportDataCSV(pathtodata::String, fieldname::String)
     filename = string(pathtodata, fieldname, ".csv")
     # write solution to a file
     CSV.write(filename, eval(Meta.parse(string("df_",fieldname))); delim=',');
-  end # function writeData
+  end # function exportDataCSV
 
 # export LPmodel as txt
 # usage: exportLPModelTxt("./data/model.txt", m)
@@ -17,7 +17,7 @@ function exportLPModelTxt(filename::String, LPmodel::Model)
   open(filename, "w") do f
     print(f, LPmodel)
   end
-end # function writeData
+end # function exportLPModelTxt
 
 
 ####################################################################################

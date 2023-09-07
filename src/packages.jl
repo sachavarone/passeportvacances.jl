@@ -30,10 +30,15 @@ if ! in("HiGHS",keys(installs))
 end
 using HiGHS
 
-# if ! in("Gurobi",keys(installs))
-# 	Pkg.add("Gurobi")
-# end
-# using Gurobi
+if ! in("NEOSServer",keys(installs))
+	Pkg.add("NEOSServer")
+end
+using NEOSServer
+
+if ! in("Gurobi",keys(installs))
+	Pkg.add("Gurobi")
+end
+using Gurobi
 
 if ! in("JuMP",keys(installs))
 	Pkg.add("JuMP")

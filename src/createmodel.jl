@@ -211,16 +211,26 @@ function createmodel(
 if solver == "GUROBI"
     GRB_ENV = Gurobi.Env()
     m = Model(() -> Gurobi.Optimizer(GRB_ENV))
-    set_optimizer_attribute(m, "TimeLimit", 300)
-    set_optimizer_attribute(m, "MIPGap", 0.01)
+    set_optimizer_attribute(m, "TimeLimit", 60*20)
+    set_optimizer_attribute(m, "MIPGap", 0.1)
 elseif solver == "HiGHS"
     m = Model(HiGHS.Optimizer)
-    set_optimizer_attribute(m, "time_limit", 300.0)
-    set_optimizer_attribute(m, "mip_rel_gap", 0.01)
+    set_optimizer_attribute(m, "time_limit", 60.0*20)
+    set_optimizer_attribute(m, "mip_rel_gap", 0.1)
+elseif solver == "NEOS"
+    # use Cplex as solver for NEOS
+    m = Model() do
+        NEOSServer.Optimizer(email=myemail, solver="CPLEX")
+        # set_optimizer_attribute(m, "CPXPARAM_MIP_Pool_RelGap", 0.1)
+        # set_optimizer_attribute(m, "CPXPARAM_DetTimeLimit", 900)
+    end    
 else
     m = Model(Cbc.Optimizer)
+    set_optimizer_attribute(m, "seconds", 60*20)
     set_optimizer_attribute(m, "ratioGap", 0.1)
-    # set_optimizer_attribute(m, "seconds", 600)
+    # set_optimizer_attribute(m, "maxSolutions", 10000)
+    # set_optimizer_attribute(m, "maxNodes", 500)
+    set_optimizer_attribute(m, "threads", 4)
 end # if solver
 
     # set the variables
