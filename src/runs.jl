@@ -75,7 +75,7 @@ function runValidPreAssignment!(previousStatus::MOI.TerminationStatusCode, m::Mo
 end
 
 
-function run(dbname::String, solvername = "CBC")
+function run(dbname::String, solvername = "CBC", localdata = false)
 # get the data
 df_activity, 
 df_child ,
@@ -176,6 +176,13 @@ if status == MOI.OPTIMAL
         # write table preassigned into the database
         writeSolutionMySQL(dbname, "preassigned", df_assigned)
         @info "Table 'preassigned' written in the database"
+    end
+
+    if localdata
+        # write solution and remainder as csv files
+        writeSolution("./", solution)
+        writeRemainder("./", remainder)
+        @info "Data exported locally."
     end
 
 else
