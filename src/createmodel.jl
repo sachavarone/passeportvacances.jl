@@ -24,7 +24,7 @@ function constraintInactive!(m::Model, df_preference::DataFrame)
             x[pref]
             for
             pref in
-            df_preference[df_preference[:, :inactive].==1, :idpreference]
+            df_preference[df_preference[:, :inactive].!=0, :idpreference]
         ) == 0
     )
 end # function constraintInactive!
